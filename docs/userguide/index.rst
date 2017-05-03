@@ -15,12 +15,15 @@
     calling
     canvas
     workers
+    daemonizing
     periodic-tasks
-    remote-tasks
     routing
     monitoring
     security
     optimizing
+    debugging
     concurrency/index
     signals
+    testing
     extending
+    configuration

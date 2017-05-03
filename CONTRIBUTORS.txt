@@ -11,7 +11,7 @@ that everyone must add themselves here, and not be added
 by others, so it's currently incomplete waiting for everyone
 to add their names.
 
-The full list of authors can be found in docs/AUTHORS.txt.
+The list of authors added before the policy change can be found in docs/AUTHORS.txt.
 
 --
 
@@ -156,6 +156,7 @@ Antoine Legrand, 2014/01/09
 Pepijn de Vos, 2014/01/15
 Dan McGee, 2014/01/27
 Paul Kilgo, 2014/01/28
+Môshe van der Sterre, 2014/01/31
 Martin Davidsson, 2014/02/08
 Chris Clark, 2014/02/20
 Matthew Duggan, 2014/04/10
@@ -189,3 +190,49 @@ James Pulec, 2015/04/19
 Alexander Lebedev, 2015/04/25
 Frantisek Holop, 2015/05/21
 Feanil Patel, 2015/05/21
+Jocelyn Delalande, 2015/06/03
+Justin Patrin, 2015/08/06
+Juan Rossi, 2015/08/10
+Piotr Maślanka, 2015/08/24
+Gerald Manipon, 2015/10/19
+Krzysztof Bujniewicz, 2015/10/21
+Sukrit Khera, 2015/10/26
+Dave Smith, 2015/10/27
+Dennis Brakhane, 2015/10/30
+Chris Harris, 2015/11/27
+Valentyn Klindukh, 2016/01/15
+Wayne Chang, 2016/01/15
+Mike Attwood, 2016/01/22
+David Harrigan, 2016/02/01
+Ahmet Demir, 2016/02/27
+Maxime Verger, 2016/02/29
+Alexander Oblovatniy, 2016/03/10
+Komu Wairagu, 2016/04/03
+Joe Sanford, 2016/04/11
+Takeshi Kanemoto, 2016/04/22
+Arthur Vuillard, 2016/04/22
+Colin McIntosh, 2016/04/26
+Jeremy Zafran, 2016/05/17
+Anand Reddy Pandikunta, 2016/06/18
+Adriano Martins de Jesus, 2016/06/22
+Kevin Richardson, 2016/06/29
+Andrew Stewart, 2016/07/04
+Xin Li, 2016/08/03
+Alli Witheford, 2016/09/29
+Alan Justino da Silva, 2016/10/14
+Marat Sharafutdinov, 2016/11/04
+Viktor Holmqvist, 2016/12/02
+Rick Wargo, 2016/12/02
+zhengxiaowai, 2016/12/07
+Michael Howitz, 2016/12/08
+Andreas Pelme, 2016/12/13
+Mike Chen, 2016/12/20
+Alejandro Pernin, 2016/12/23
+Yuval Shalev, 2016/12/27
+Morgan Doocy, 2017/01/02
+Arcadiy Ivanov, 2017/01/08
+Ryan Hiebert, 2017/01/20
+Jianjian Yu, 2017/04/09
+Brian May, 2017/04/10
+Dmytro Petruk, 2017/04/12
+Joey Wilhelm, 2017/04/12

@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-    celery.events.cursesmon
-    ~~~~~~~~~~~~~~~~~~~~~~~
-
-    Graphical monitor of Celery events using curses.
-
-"""
-from __future__ import absolute_import, print_function
+"""Graphical monitor of Celery events using curses."""
+from __future__ import absolute_import, print_function, unicode_literals
 
 import curses
 import sys
@@ -43,9 +37,10 @@ events: {s.event_count} tasks:{s.task_count} workers:{w_alive}/{w_all}
 
 
 class CursesMonitor(object):  # pragma: no cover
+    """A curses based Celery task monitor."""
+
     keymap = {}
     win = None
-    screen_width = None
     screen_delay = 10
     selected_task = None
     selected_position = 0
@@ -62,13 +57,15 @@ class CursesMonitor(object):  # pragma: no cover
         self.app = app
         self.keymap = keymap or self.keymap
         self.state = state
-        default_keymap = {'J': self.move_selection_down,
-                          'K': self.move_selection_up,
-                          'C': self.revoke_selection,
-                          'T': self.selection_traceback,
-                          'R': self.selection_result,
-                          'I': self.selection_info,
-                          'L': self.selection_rate_limit}
+        default_keymap = {
+            'J': self.move_selection_down,
+            'K': self.move_selection_up,
+            'C': self.revoke_selection,
+            'T': self.selection_traceback,
+            'R': self.selection_result,
+            'I': self.selection_info,
+            'L': self.selection_rate_limit,
+        }
         self.keymap = dict(default_keymap, **self.keymap)
         self.lock = threading.RLock()
 
@@ -154,7 +151,7 @@ class CursesMonitor(object):  # pragma: no cover
     def handle_keypress(self):
         try:
             key = self.win.getkey().upper()
-        except:
+        except Exception:  # pylint: disable=broad-except
             return
         key = self.keyalias.get(key) or key
         handler = self.keymap.get(key)
@@ -176,7 +173,7 @@ class CursesMonitor(object):  # pragma: no cover
         while 1:
             try:
                 return self.win.getkey().upper()
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
 
     def selection_rate_limit(self):
@@ -318,9 +315,9 @@ class CursesMonitor(object):  # pragma: no cover
         def alert_callback(my, mx, xs):
             y = count(xs)
             task = self.state.tasks[self.selected_task]
-            result = (getattr(task, 'result', None)
-                      or getattr(task, 'exception', None))
-            for line in wrap(result, mx - 2):
+            result = (getattr(task, 'result', None) or
+                      getattr(task, 'exception', None))
+            for line in wrap(result or '', mx - 2):
                 self.win.addstr(next(y), 3, line)
 
         return self.alert(
@@ -424,7 +421,7 @@ class CursesMonitor(object):  # pragma: no cover
                 STATUS_SCREEN.format(
                     s=self.state,
                     w_alive=len([w for w in values(self.state.workers)
-                                if w.alive]),
+                                 if w.alive]),
                     w_all=len(self.state.workers),
                 ),
                 curses.A_DIM,
@@ -503,15 +500,15 @@ class DisplayThread(threading.Thread):  # pragma: no cover
 def capture_events(app, state, display):  # pragma: no cover
 
     def on_connection_error(exc, interval):
-        print('Connection Error: {0!r}. Retry in {1}s.'.format(
+        print('Connection Error: {0!r}.  Retry in {1}s.'.format(
             exc, interval), file=sys.stderr)
 
     while 1:
         print('-> evtop: starting capture...', file=sys.stderr)
-        with app.connection() as conn:
+        with app.connection_for_read() as conn:
             try:
                 conn.ensure_connection(on_connection_error,
-                                       app.conf.BROKER_CONNECTION_MAX_RETRIES)
+                                       app.conf.broker_connection_max_retries)
                 recv = app.events.Receiver(conn, handlers={'*': state.event})
                 display.resetscreen()
                 display.init_screen()
@@ -521,6 +518,7 @@ def capture_events(app, state, display):  # pragma: no cover
 
 
 def evtop(app=None):  # pragma: no cover
+    """Start curses monitor."""
     app = app_or_default(app)
     state = app.events.State()
     display = CursesMonitor(state, app)

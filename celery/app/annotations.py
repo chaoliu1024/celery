@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
+"""Task Annotations.
+
+Annotations is a nice term for monkey-patching task classes
+in the configuration.
+
+This prepares and performs the annotations in the
+:setting:`task_annotations` setting.
 """
-    celery.app.annotations
-    ~~~~~~~~~~~~~~~~~~~~~~
-
-    Annotations is a nice term for moneky patching
-    task classes in the configuration.
-
-    This prepares and performs the annotations in the
-    :setting:`CELERY_ANNOTATIONS` setting.
-
-"""
-from __future__ import absolute_import
-
+from __future__ import absolute_import, unicode_literals
 from celery.five import string_t
 from celery.utils.functional import firstmethod, mlazy
 from celery.utils.imports import instantiate
@@ -23,6 +19,7 @@ __all__ = ['MapAnnotation', 'prepare', 'resolve_all']
 
 
 class MapAnnotation(dict):
+    """Annotation map: task_name => attributes."""
 
     def annotate_any(self):
         try:
@@ -38,8 +35,7 @@ class MapAnnotation(dict):
 
 
 def prepare(annotations):
-    """Expands the :setting:`CELERY_ANNOTATIONS` setting."""
-
+    """Expand the :setting:`task_annotations` setting."""
     def expand_annotation(annotation):
         if isinstance(annotation, dict):
             return MapAnnotation(annotation)
@@ -55,4 +51,5 @@ def prepare(annotations):
 
 
 def resolve_all(anno, task):
+    """Resolve all pending annotations."""
     return (x for x in (_first_match(anno, task), _first_match_any(anno)) if x)

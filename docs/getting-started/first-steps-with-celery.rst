@@ -6,14 +6,15 @@
 =========================
 
 Celery is a task queue with batteries included.
-It is easy to use so that you can get started without learning
-the full complexities of the problem it solves. It is designed
+It's easy to use so that you can get started without learning
+the full complexities of the problem it solves. It's designed
 around best practices so that your product can scale
 and integrate with other languages, and it comes with the
 tools and support you need to run such a system in production.
 
-In this tutorial you will learn the absolute basics of using Celery.
-You will learn about;
+In this tutorial you'll learn the absolute basics of using Celery.
+
+Learn about;
 
 - Choosing and installing a message transport (broker).
 - Installing Celery and creating your first task.
@@ -22,11 +23,11 @@ You will learn about;
   and inspecting return values.
 
 Celery may seem daunting at first - but don't worry - this tutorial
-will get you started in no time. It is deliberately kept simple, so
+will get you started in no time. It's deliberately kept simple, so
 to not confuse you with advanced features.
 After you have finished this tutorial
 it's a good idea to browse the rest of the documentation,
-for example the :ref:`next-steps` tutorial, which will
+for example the :ref:`next-steps` tutorial will
 showcase Celery's capabilities.
 
 .. contents::
@@ -53,10 +54,10 @@ Detailed information about using RabbitMQ with Celery:
 
 .. _`RabbitMQ`: http://www.rabbitmq.com/
 
-If you are using Ubuntu or Debian install RabbitMQ by executing this
+If you're using Ubuntu or Debian install RabbitMQ by executing this
 command:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ sudo apt-get install rabbitmq-server
 
@@ -69,37 +70,21 @@ platforms, including Microsoft Windows:
 
     http://www.rabbitmq.com/download.html
 
-
 Redis
 -----
 
 `Redis`_ is also feature-complete, but is more susceptible to data loss in
 the event of abrupt termination or power failures. Detailed information about using Redis:
 
-    :ref:`broker-redis`
+:ref:`broker-redis`
 
-.. _`Redis`: http://redis.io/
-
-
-Using a database
-----------------
-
-Using a database as a message queue is not recommended, but can be sufficient
-for very small installations.  Your options include:
-
-* :ref:`broker-sqlalchemy`
-* :ref:`broker-django`
-
-If you're already using a Django database for example, using it as your
-message broker can be convenient while developing even if you use a more
-robust system in production.
+.. _`Redis`: https://redis.io/
 
 Other brokers
 -------------
 
 In addition to the above, there are other experimental transport implementations
-to choose from, including :ref:`Amazon SQS <broker-sqs>`, :ref:`broker-mongodb`
-and :ref:`IronMQ <broker-ironmq>`.
+to choose from, including :ref:`Amazon SQS <broker-sqs>`.
 
 See :ref:`broker-overview` for a full list.
 
@@ -111,19 +96,19 @@ Installing Celery
 Celery is on the Python Package Index (PyPI), so it can be installed
 with standard Python tools like ``pip`` or ``easy_install``:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ pip install celery
 
 Application
 ===========
 
-The first thing you need is a Celery instance, which is called the celery
-application or just "app" for short.  Since this instance is used as
+The first thing you need is a Celery instance.  We call this the *Celery
+application* or just *app* for short. As this instance is used as
 the entry-point for everything you want to do in Celery, like creating tasks and
 managing workers, it must be possible for other modules to import it.
 
-In this tutorial you will keep everything contained in a single module,
+In this tutorial we keep everything contained in a single module,
 but for larger projects you want to create
 a :ref:`dedicated module <project-layout>`.
 
@@ -133,53 +118,56 @@ Let's create the file :file:`tasks.py`:
 
     from celery import Celery
 
-    app = Celery('tasks', broker='amqp://guest@localhost//')
+    app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
     @app.task
     def add(x, y):
         return x + y
 
-The first argument to :class:`~celery.app.Celery` is the name of the current module,
-this is needed so that names can be automatically generated, the second
-argument is the broker keyword argument which specifies the URL of the
-message broker you want to use, using RabbitMQ here, which is already the
-default option.  See :ref:`celerytut-broker` above for more choices,
-e.g. for RabbitMQ you can use ``amqp://localhost``, or for Redis you can
+The first argument to :class:`~celery.app.Celery` is the name of the current module.
+This is only needed to allow names to be generated automatically when the tasks are
+defined in the ``__main__`` module.
+
+The second argument is the broker keyword argument, specifying the URL of the
+message broker you want to use. Here using RabbitMQ (also the default option).
+
+See :ref:`celerytut-broker` above for more choices --
+for RabbitMQ you can use ``amqp://localhost``, or for Redis you can
 use ``redis://localhost``.
 
-You defined a single task, called ``add``, which returns the sum of two numbers.
+You defined a single task, called ``add``, returning the sum of two numbers.
 
 .. _celerytut-running-the-worker:
 
-Running the celery worker server
+Running the Celery worker server
 ================================
 
 You now run the worker by executing our program with the ``worker``
 argument:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ celery -A tasks worker --loglevel=info
 
 .. note::
 
     See the :ref:`celerytut-troubleshooting` section if the worker
-    does not start.
+    doesn't start.
 
-In production you will want to run the worker in the
-background as a daemon.  To do this you need to use the tools provided
+In production you'll want to run the worker in the
+background as a daemon. To do this you need to use the tools provided
 by your platform, or something like `supervisord`_ (see :ref:`daemonizing`
 for more information).
 
 For a complete listing of the command-line options available, do:
 
-.. code-block:: bash
+.. code-block:: console
 
     $  celery worker --help
 
 There are also several other commands available, and help is also available:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ celery help
 
@@ -193,7 +181,7 @@ Calling the task
 To call our task you can use the :meth:`~@Task.delay` method.
 
 This is a handy shortcut to the :meth:`~@Task.apply_async`
-method which gives greater control of the task execution (see
+method that gives greater control of the task execution (see
 :ref:`guide-calling`)::
 
     >>> from tasks import add
@@ -202,11 +190,13 @@ method which gives greater control of the task execution (see
 The task has now been processed by the worker you started earlier,
 and you can verify that by looking at the workers console output.
 
-Calling a task returns an :class:`~@AsyncResult` instance,
-which can be used to check the state of the task, wait for the task to finish
+Calling a task returns an :class:`~@AsyncResult` instance:
+this can be used to check the state of the task, wait for the task to finish,
 or get its return value (or if the task failed, the exception and traceback).
-But this isn't enabled by default, and you have to configure Celery to
-use a result backend, which is detailed in the next section.
+
+Results aren't enabled by default, so if you want to do RPC or keep track
+of task results in a database you have to configure Celery to use a result
+backend.  This is described by the next section.
 
 .. _celerytut-keeping-results:
 
@@ -214,56 +204,71 @@ Keeping Results
 ===============
 
 If you want to keep track of the tasks' states, Celery needs to store or send
-the states somewhere.  There are several
+the states somewhere. There are several
 built-in result backends to choose from: `SQLAlchemy`_/`Django`_ ORM,
-`Memcached`_, `Redis`_, AMQP (`RabbitMQ`_), and `MongoDB`_ -- or you can define your own.
+`Memcached`_, `Redis`_, :ref:`RPC <conf-rpc-result-backend>` (`RabbitMQ`_/AMQP),
+and -- or you can define your own.
 
 .. _`Memcached`: http://memcached.org
 .. _`MongoDB`: http://www.mongodb.org
 .. _`SQLAlchemy`: http://www.sqlalchemy.org/
 .. _`Django`: http://djangoproject.com
 
-For this example you will use the `rpc` result backend, which sends states
-back as transient messages.  The backend is specified via the ``backend`` argument to
-:class:`@Celery`, (or via the :setting:`CELERY_RESULT_BACKEND` setting if
-you choose to use a configuration module)::
+For this example we use the `rpc` result backend, that sends states
+back as transient messages. The backend is specified via the ``backend`` argument to
+:class:`@Celery`, (or via the :setting:`result_backend` setting if
+you choose to use a configuration module):
 
-    app = Celery('tasks', backend='rpc://', broker='amqp://')
+.. code-block:: python
+
+    app = Celery('tasks', backend='rpc://', broker='pyamqp://')
 
 Or if you want to use Redis as the result backend, but still use RabbitMQ as
-the message broker (a popular combination)::
+the message broker (a popular combination):
 
-    app = Celery('tasks', backend='redis://localhost', broker='amqp://')
+.. code-block:: python
+
+    app = Celery('tasks', backend='redis://localhost', broker='pyamqp://')
 
 To read more about result backends please see :ref:`task-result-backends`.
 
 Now with the result backend configured, let's call the task again.
 This time you'll hold on to the :class:`~@AsyncResult` instance returned
-when you call a task::
+when you call a task:
+
+.. code-block:: pycon
 
     >>> result = add.delay(4, 4)
 
 The :meth:`~@AsyncResult.ready` method returns whether the task
-has finished processing or not::
+has finished processing or not:
+
+.. code-block:: pycon
 
     >>> result.ready()
     False
 
 You can wait for the result to complete, but this is rarely used
-since it turns the asynchronous call into a synchronous one::
+since it turns the asynchronous call into a synchronous one:
+
+.. code-block:: pycon
 
     >>> result.get(timeout=1)
     8
 
 In case the task raised an exception, :meth:`~@AsyncResult.get` will
 re-raise the exception, but you can override this by specifying
-the ``propagate`` argument::
+the ``propagate`` argument:
+
+.. code-block:: pycon
 
     >>> result.get(propagate=False)
 
 
 If the task raised an exception you can also gain access to the
-original traceback::
+original traceback:
+
+.. code-block:: pycon
 
     >>> result.traceback
     …
@@ -275,10 +280,10 @@ See :mod:`celery.result` for the complete result object reference.
 Configuration
 =============
 
-Celery, like a consumer appliance doesn't need much to be operated.
+Celery, like a consumer appliance, doesn't need much to be operated.
 It has an input and an output, where you must connect the input to a broker and maybe
-the output to a result backend if so wanted.  But if you look closely at the back
-there's a lid revealing loads of sliders, dials and buttons: this is the configuration.
+the output to a result backend if so wanted. But if you look closely at the back
+there's a lid revealing loads of sliders, dials, and buttons: this is the configuration.
 
 The default configuration should be good enough for most uses, but there are
 many things to tweak so Celery works just the way you want it to.
@@ -289,27 +294,27 @@ can be configured. You can read about the options in the
 The configuration can be set on the app directly or by using a dedicated
 configuration module.
 As an example you can configure the default serializer used for serializing
-task payloads by changing the :setting:`CELERY_TASK_SERIALIZER` setting:
+task payloads by changing the :setting:`task_serializer` setting:
 
 .. code-block:: python
 
-    app.conf.CELERY_TASK_SERIALIZER = 'json'
+    app.conf.task_serializer = 'json'
 
-If you are configuring many settings at once you can use ``update``:
+If you're configuring many settings at once you can use ``update``:
 
 .. code-block:: python
 
     app.conf.update(
-        CELERY_TASK_SERIALIZER='json',
-        CELERY_ACCEPT_CONTENT=['json'],  # Ignore other content
-        CELERY_RESULT_SERIALIZER='json',
-        CELERY_TIMEZONE='Europe/Oslo',
-        CELERY_ENABLE_UTC=True,
+        task_serializer='json',
+        accept_content=['json'],  # Ignore other content
+        result_serializer='json',
+        timezone='Europe/Oslo',
+        enable_utc=True,
     )
 
 For larger projects using a dedicated configuration module is useful,
-in fact you are discouraged from hard coding
-periodic task intervals and task routing options, as it is much
+in fact you're discouraged from hard coding
+periodic task intervals and task routing options, as it's much
 better to keep this in a centralized location, and especially for libraries
 it makes it possible for users to control how they want your tasks to behave,
 you can also imagine your SysAdmin making simple changes to the configuration
@@ -332,32 +337,32 @@ current directory or on the Python path, it could look like this:
 
 .. code-block:: python
 
-    BROKER_URL = 'amqp://'
-    CELERY_RESULT_BACKEND = 'rpc://'
+    broker_url = 'pyamqp://'
+    result_backend = 'rpc://'
 
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_RESULT_SERIALIZER = 'json'
-    CELERY_ACCEPT_CONTENT=['json']
-    CELERY_TIMEZONE = 'Europe/Oslo'
-    CELERY_ENABLE_UTC = True
+    task_serializer = 'json'
+    result_serializer = 'json'
+    accept_content = ['json']
+    timezone = 'Europe/Oslo'
+    enable_utc = True
 
 To verify that your configuration file works properly, and doesn't
 contain any syntax errors, you can try to import it:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python -m celeryconfig
 
 For a complete reference of configuration options, see :ref:`configuration`.
 
-To demonstrate the power of configuration files, this is how you would
+To demonstrate the power of configuration files, this is how you'd
 route a misbehaving task to a dedicated queue:
 
 :file:`celeryconfig.py`:
 
 .. code-block:: python
 
-    CELERY_ROUTES = {
+    task_routes = {
         'tasks.add': 'low-priority',
     }
 
@@ -369,22 +374,22 @@ instead, so that only 10 tasks of this type can be processed in a minute
 
 .. code-block:: python
 
-    CELERY_ANNOTATIONS = {
+    task_annotations = {
         'tasks.add': {'rate_limit': '10/m'}
     }
 
-If you are using RabbitMQ or Redis as the
+If you're using RabbitMQ or Redis as the
 broker then you can also direct the workers to set a new rate limit
 for the task at runtime:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ celery -A tasks control rate_limit tasks.add 10/m
     worker@example.com: OK
         new rate limit set successfully
 
 See :ref:`guide-routing` to read more about task routing,
-and the :setting:`CELERY_ANNOTATIONS` setting for more about annotations,
+and the :setting:`task_annotations` setting for more about annotations,
 or :ref:`guide-monitoring` for more about remote control commands,
 and how to monitor what your workers are doing.
 
@@ -402,59 +407,61 @@ Troubleshooting
 
 There's also a troubleshooting section in the :ref:`faq`.
 
-Worker does not start: Permission Error
----------------------------------------
+Worker doesn't start: Permission Error
+--------------------------------------
 
 - If you're using Debian, Ubuntu or other Debian-based distributions:
 
-    Debian recently renamed the ``/dev/shm`` special file to ``/run/shm``.
+    Debian recently renamed the :file:`/dev/shm` special file
+    to :file:`/run/shm`.
 
     A simple workaround is to create a symbolic link:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         # ln -s /run/shm /dev/shm
 
 - Others:
 
-    If you provide any of the :option:`--pidfile`, :option:`--logfile` or
-    ``--statedb`` arguments, then you must make sure that they
-    point to a file/directory that is writable and readable by the
-    user starting the worker.
+    If you provide any of the :option:`--pidfile <celery worker --pidfile>`,
+    :option:`--logfile <celery worker --logfile>` or
+    :option:`--statedb <celery worker --statedb>` arguments, then you must
+    make sure that they point to a file/directory that's writable and
+    readable by the user starting the worker.
 
-Result backend does not work or tasks are always in ``PENDING`` state.
-----------------------------------------------------------------------
+Result backend doesn't work or tasks are always in ``PENDING`` state
+--------------------------------------------------------------------
 
-All tasks are ``PENDING`` by default, so the state would have been
-better named "unknown".  Celery does not update any state when a task
+All tasks are :state:`PENDING` by default, so the state would've been
+better named "unknown". Celery doesn't update any state when a task
 is sent, and any task with no history is assumed to be pending (you know
 the task id after all).
 
-1) Make sure that the task does not have ``ignore_result`` enabled.
+1) Make sure that the task doesn't have ``ignore_result`` enabled.
 
     Enabling this option will force the worker to skip updating
     states.
 
-2) Make sure the :setting:`CELERY_IGNORE_RESULT` setting is not enabled.
+2) Make sure the :setting:`task_ignore_result` setting isn't enabled.
 
-3) Make sure that you do not have any old workers still running.
+3) Make sure that you don't have any old workers still running.
 
     It's easy to start multiple workers by accident, so make sure
     that the previous worker is properly shutdown before you start a new one.
 
-    An old worker that is not configured with the expected result backend
+    An old worker that aren't configured with the expected result backend
     may be running and is hijacking the tasks.
 
-    The `--pidfile` argument can be set to an absolute path to make sure
-    this doesn't happen.
+    The :option:`--pidfile <celery worker --pidfile>` argument can be set to
+    an absolute path to make sure this doesn't happen.
 
 4) Make sure the client is configured with the right backend.
 
     If for some reason the client is configured to use a different backend
-    than the worker, you will not be able to receive the result,
+    than the worker, you won't be able to receive the result,
     so make sure the backend is correct by inspecting it:
 
-    .. code-block:: python
+    .. code-block:: pycon
 
-        >>> result = task.delay(…)
+        >>> result = task.delay()
         >>> print(result.backend)

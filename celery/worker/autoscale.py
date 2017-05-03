@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
+"""Pool Autoscaling.
+
+This module implements the internal thread responsible
+for growing and shrinking the pool according to the
+current autoscale settings.
+
+The autoscale thread is only enabled if
+the :option:`celery worker --autoscale` option is used.
 """
-    celery.worker.autoscale
-    ~~~~~~~~~~~~~~~~~~~~~~~
-
-    This module implements the internal thread responsible
-    for growing and shrinking the pool according to the
-    current autoscale settings.
-
-    The autoscale thread is only enabled if :option:`--autoscale`
-    has been enabled on the command-line.
-
-"""
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 import threading
@@ -37,6 +34,8 @@ AUTOSCALE_KEEPALIVE = float(os.environ.get('AUTOSCALE_KEEPALIVE', 30))
 
 
 class WorkerComponent(bootsteps.StartStopStep):
+    """Bootstep that starts the autoscaler thread/timer in the worker."""
+
     label = 'Autoscaler'
     conditional = True
     requires = (Pool,)
@@ -61,6 +60,7 @@ class WorkerComponent(bootsteps.StartStopStep):
 
 
 class Autoscaler(bgThread):
+    """Background thread to autoscale pool workers."""
 
     def __init__(self, pool, max_concurrency,
                  min_concurrency=0, worker=None,
@@ -147,10 +147,12 @@ class Autoscaler(bgThread):
         self.worker.consumer._update_prefetch_count(-n)
 
     def info(self):
-        return {'max': self.max_concurrency,
-                'min': self.min_concurrency,
-                'current': self.processes,
-                'qty': self.qty}
+        return {
+            'max': self.max_concurrency,
+            'min': self.min_concurrency,
+            'current': self.processes,
+            'qty': self.qty,
+        }
 
     @property
     def qty(self):

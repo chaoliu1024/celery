@@ -1,36 +1,33 @@
 # -*- coding: utf-8 -*-
-"""
-    celery.security.serialization
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Secure serializer.
-
-"""
-from __future__ import absolute_import
+"""Secure serializer."""
+from __future__ import absolute_import, unicode_literals
 
 from kombu.serialization import registry, dumps, loads
 from kombu.utils.encoding import bytes_to_str, str_to_bytes, ensure_bytes
 
+from celery.five import bytes_if_py2
+from celery.utils.serialization import b64encode, b64decode
+
 from .certificate import Certificate, FSCertStore
 from .key import PrivateKey
 from .utils import reraise_errors
-from celery.utils.serialization import b64encode, b64decode
 
 __all__ = ['SecureSerializer', 'register_auth']
 
 
 class SecureSerializer(object):
+    """Signed serializer."""
 
     def __init__(self, key=None, cert=None, cert_store=None,
                  digest='sha1', serializer='json'):
         self._key = key
         self._cert = cert
         self._cert_store = cert_store
-        self._digest = digest
+        self._digest = bytes_if_py2(digest)
         self._serializer = serializer
 
     def serialize(self, data):
-        """serialize data structure into string"""
+        """Serialize data structure into string."""
         assert self._key is not None
         assert self._cert is not None
         with reraise_errors('Unable to serialize: {0!r}', (Exception,)):
@@ -46,7 +43,7 @@ class SecureSerializer(object):
                               signer=self._cert.get_id())
 
     def deserialize(self, data):
-        """deserialize data structure from string"""
+        """Deserialize data structure from string."""
         assert self._cert_store is not None
         with reraise_errors('Unable to deserialize: {0!r}', (Exception,)):
             payload = self._unpack(data)
@@ -76,7 +73,7 @@ class SecureSerializer(object):
         signature = raw_payload[
             first_sep + len(sep):first_sep + len(sep) + sig_len
         ]
-        end_of_sig = first_sep + len(sep) + sig_len+len(sep)
+        end_of_sig = first_sep + len(sep) + sig_len + len(sep)
 
         v = raw_payload[end_of_sig:].split(sep)
 
@@ -91,7 +88,7 @@ class SecureSerializer(object):
 
 def register_auth(key=None, cert=None, store=None, digest='sha1',
                   serializer='json'):
-    """register security serializer"""
+    """Register security serializer."""
     s = SecureSerializer(key and PrivateKey(key),
                          cert and Certificate(cert),
                          store and FSCertStore(store),

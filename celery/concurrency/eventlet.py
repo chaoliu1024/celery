@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-    celery.concurrency.eventlet
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    Eventlet pool implementation.
-
-"""
-from __future__ import absolute_import
-
+"""Eventlet execution pool."""
+from __future__ import absolute_import, unicode_literals
 import sys
-
-from time import time
+from kombu.five import monotonic
 
 __all__ = ['TaskPool']
 
@@ -28,12 +20,13 @@ for mod in (mod for mod in sys.modules if mod.startswith(RACE_MODS)):
             import warnings
             warnings.warn(RuntimeWarning(W_RACE % side))
 
-from kombu.async import timer as _timer
+# idiotic pep8.py does not allow expressions before imports
+# so have to silence errors here
+from kombu.async import timer as _timer  # noqa
 
+from celery import signals  # noqa
 
-from celery import signals
-
-from . import base
+from . import base  # noqa
 
 
 def apply_target(target, args=(), kwargs={}, callback=None,
@@ -43,6 +36,7 @@ def apply_target(target, args=(), kwargs={}, callback=None,
 
 
 class Timer(_timer.Timer):
+    """Eventlet Timer."""
 
     def __init__(self, *args, **kwargs):
         from eventlet.greenthread import spawn_after
@@ -53,15 +47,15 @@ class Timer(_timer.Timer):
         self._spawn_after = spawn_after
         self._queue = set()
 
-    def _enter(self, eta, priority, entry):
-        secs = max(eta - time(), 0)
+    def _enter(self, eta, priority, entry, **kwargs):
+        secs = max(eta - monotonic(), 0)
         g = self._spawn_after(secs, entry)
         self._queue.add(g)
         g.link(self._entry_exit, entry)
         g.entry = entry
         g.eta = eta
         g.priority = priority
-        g.cancelled = False
+        g.canceled = False
         return g
 
     def _entry_exit(self, g, entry):
@@ -70,7 +64,7 @@ class Timer(_timer.Timer):
                 g.wait()
             except self.GreenletExit:
                 entry.cancel()
-                g.cancelled = True
+                g.canceled = True
         finally:
             self._queue.discard(g)
 
@@ -94,11 +88,15 @@ class Timer(_timer.Timer):
 
 
 class TaskPool(base.BasePool):
+    """Eventlet Task Pool."""
+
     Timer = Timer
 
     signal_safe = False
     is_green = True
     task_join_will_block = False
+    _pool = None
+    _quick_put = None
 
     def __init__(self, *args, **kwargs):
         from eventlet import greenthread
@@ -142,8 +140,10 @@ class TaskPool(base.BasePool):
         self.limit = limit
 
     def _get_info(self):
-        return {
+        info = super(TaskPool, self)._get_info()
+        info.update({
             'max-concurrency': self.limit,
             'free-threads': self._pool.free(),
             'running-threads': self._pool.running(),
-        }
+        })
+        return info
